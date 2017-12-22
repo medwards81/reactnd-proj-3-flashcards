@@ -8,6 +8,7 @@ import {
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { addDeck } from '../actions';
 import { saveDeckTitle } from '../utils/api';
 import MyTextInput from './MyTextInput';
 import { reduxForm, Field } from 'redux-form';
@@ -50,6 +51,12 @@ class AddDeck extends Component {
   }
   submit = ({ title }) => {
     if (!title.length) return false;
+
+    this.props.dispatch(
+      addDeck({
+        [title]: { title: title, cards: [] }
+      })
+    );
 
     this.toHome();
 

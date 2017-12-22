@@ -60,8 +60,6 @@ class DecksList extends Component {
     const { decks } = this.props;
     const { ready } = this.state;
 
-    console.log({ decks, ready });
-
     if (ready === false) return <AppLoading />;
 
     return (
