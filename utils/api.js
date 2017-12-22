@@ -8,14 +8,14 @@ export function getDecks() {
   );
 }
 
-// export function submitEntry({ entry, key }) {
-//   return AsyncStorage.mergeItem(
-//     DECKS_STORAGE_KEY,
-//     JSON.stringify({
-//       [key]: entry
-//     })
-//   );
-// }
+export function saveDeckTitle(title) {
+  return AsyncStorage.mergeItem(
+    DECKS_STORAGE_KEY,
+    JSON.stringify({
+      [title]: { title: title, cards: [] }
+    })
+  );
+}
 //
 // export function removeEntry(key) {
 //   return AsyncStorage.getItem(DECKS_STORAGE_KEY).then(results => {

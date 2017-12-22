@@ -3,7 +3,7 @@ import { View, Platform, StatusBar } from 'react-native';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducer from './reducers';
-import Decks from './components/Decks';
+import DecksList from './components/DecksList';
 import AddDeck from './components/AddDeck';
 import { TabNavigator } from 'react-navigation';
 import { purple, white } from './utils/colors';
@@ -20,7 +20,7 @@ const AppStatusBar = ({ backgroundColor, ...props }) => {
 const MainScreenNavigator = TabNavigator(
   {
     Decks: {
-      screen: Decks,
+      screen: DecksList,
       navigationOptions: {
         tabBarLabel: 'Decks'
       }

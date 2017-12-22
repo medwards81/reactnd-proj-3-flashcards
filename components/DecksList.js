@@ -4,7 +4,8 @@ import {
   Text,
   StyleSheet,
   Platform,
-  TouchableOpacity
+  TouchableOpacity,
+  FlatList
 } from 'react-native';
 import { connect } from 'react-redux';
 import { receiveDecks, addDeck } from '../actions';
@@ -28,27 +29,26 @@ class DecksList extends Component {
       );
   }
 
-  // renderItem = ({ today, ...metrics }, formattedDate, key) => (
-  //   <View style={styles.item}>
-  //     {today
-  //       ? <View>
-  //           <DateHeader date={formattedDate}/>
-  //           <Text style={styles.noDataText}>
-  //             {today}
-  //           </Text>
-  //         </View>
-  //       : <TouchableOpacity
-  //           onPress={() => this.props.navigation.navigate(
-  //             'EntryDetail',
-  //             { entryId: key }
-  //           )}
-  //         >
-  //           <MetricCard date={formattedDate} metrics={metrics} />
-  //         </TouchableOpacity>}
-  //   </View>
-  // )
+  renderDecks = decks => {
+    return (
+      <View style={styles.item}>
+        {Object.keys(decks).map(title =>
+          this.renderItem(title, decks[title].cards)
+        )}
+      </View>
+    );
+  };
 
-  renderNoDecks = () => (
+  renderItem = (title, cards) => {
+    return (
+      <View key={title}>
+        <Text style={{ fontSize: 35 }}>{title}</Text>
+        <Text>{cards.length} cards</Text>
+      </View>
+    );
+  };
+
+  renderEmptyDecks = () => (
     <View style={styles.item}>
       <Text style={styles.noDataText}>
         You haven't created any decks yet. Click New Deck to add one.
@@ -60,21 +60,26 @@ class DecksList extends Component {
     const { decks } = this.props;
     const { ready } = this.state;
 
-    //console.log({ decks, ready });
+    console.log({ decks, ready });
 
     if (ready === false) return <AppLoading />;
 
-    return Object.keys(decks).length ? (
-      <View>
-        <Text>JSON.stringify(decks))</Text>
+    return (
+      <View style={styles.container}>
+        {Object.keys(decks).length
+          ? this.renderDecks(decks)
+          : this.renderEmptyDecks()}
       </View>
-    ) : (
-      this.renderNoDecks()
     );
   }
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: white
+  },
   item: {
     backgroundColor: white,
     borderRadius: Platform.OS === 'ios' ? 16 : 2,
@@ -93,12 +98,14 @@ const styles = StyleSheet.create({
   },
   noDataText: {
     fontSize: 20,
-    paddingTop: 20,
-    paddingBottom: 20
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    textAlign: 'center'
   }
 });
 
-const mapStateToProps = decks => ({
+const mapStateToProps = ({ decks }) => ({
   decks
 });
 

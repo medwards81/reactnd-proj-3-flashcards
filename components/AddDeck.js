@@ -2,107 +2,79 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
+  TextInput,
   TouchableOpacity,
   StyleSheet,
   Platform
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-//import { submitEntry, removeEntry } from '../utils/api'
+import { saveDeckTitle } from '../utils/api';
+import MyTextInput from './MyTextInput';
+import { reduxForm, Field } from 'redux-form';
 import { connect } from 'react-redux';
-//import { addDeck } from '../actions'
+import * as actions from '../actions';
 import { purple, white } from '../utils/colors';
+import { NavigationActions } from 'react-navigation';
 
-// function SubmitBtn({ onPress }) {
-//   return (
-//     <TouchableOpacity
-//       style={
-//         Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.AndroidSubmitBtn
-//       }
-//       onPress={onPress}
-//     >
-//       <Text style={styles.submitBtnText}>SUBMIT</Text>
-//     </TouchableOpacity>
-//   );
-// }
+function SubmitBtn({ onPress }) {
+  return (
+    <TouchableOpacity
+      style={
+        Platform.OS === 'ios' ? styles.iosSubmitBtn : styles.AndroidSubmitBtn
+      }
+      onPress={onPress}
+    >
+      <Text style={styles.submitBtnText}>SUBMIT</Text>
+    </TouchableOpacity>
+  );
+}
 
 class AddDeck extends Component {
-  state = {
-    run: 0,
-    bike: 0,
-    swim: 0,
-    sleep: 0,
-    eat: 0
-  };
-  // increment = metric => {
-  //   const { max, step } = getMetricMetaInfo(metric);
-  //
-  //   this.setState(state => {
-  //     const count = (state[metric] = step);
-  //
-  //     return {
-  //       ...state,
-  //       [metric]: count > max ? max : count
-  //     };
-  //   });
-  // };
-  // submit = () => {
-  //   const key = timeToString();
-  //   const entry = this.state;
-  //
-  //   this.props.dispatch(
-  //     AddDeck({
-  //       [key]: entry
-  //     })
-  //   );
-  //
-  //   this.setState(() => ({
-  //     run: 0,
-  //     bike: 0,
-  //     swim: 0,
-  //     sleep: 0,
-  //     eat: 0
-  //   }));
-  //
-  //   // navigate to home
-  //
-  //   submitEntry({ key, entry });
-  //
-  //   // clean local notification
-  // };
-  // reset = () => {
-  //   const key = timeToString();
-  //
-  //   this.props.dispatch(
-  //     addEnty({
-  //       [key]: getDailyReminderValue()
-  //     })
-  //   );
-  //
-  //   // route to home
-  //
-  //   removeEntry(key);
-  // };
-  render() {
-    // const metaInfo = getMetricMetaInfo();
-    //
-    // if (this.props.alreadyLogged) {
-    //   return (
-    //     <view style={styles.center}>
-    //       <Ionicons
-    //         name={Platform.OS === 'ios' ? 'ios-happy-outline' : 'md-happy'}
-    //         size={100}
-    //       />
-    //       <Text>You already logged your information for today</Text>
-    //       <TexButton style={{ padding: 10 }} onPress={this.reset}>
-    //         Reset
-    //       </TexButton>
-    //     </view>
-    //   );
-    // }
-
+  renderField({
+    input: { onChange, ...restInput },
+    meta: { touched, error, warning }
+  }) {
     return (
       <View>
-        <Text>Add deck!</Text>
+        <TextInput
+          style={styles.input}
+          onChangeText={onChange}
+          {...restInput}
+        />
+
+        {touched &&
+          ((error && <Text>{error}</Text>) ||
+            (warning && <Text>{warning}</Text>))}
+      </View>
+    );
+  }
+  submit = ({ title }) => {
+    if (!title.length) return false;
+
+    this.toHome();
+
+    saveDeckTitle(title).then(() => {
+      //clearLocalNotification().then(setLocalNotification);
+    });
+  };
+
+  toHome = () => {
+    this.props.navigation.dispatch(NavigationActions.back({ key: 'AddDeck' }));
+  };
+
+  render() {
+    const { handleSubmit } = this.props;
+
+    return (
+      <View style={[styles.container, styles.center]}>
+        <Text style={styles.title}>What is the title of your new deck?</Text>
+        <Field
+          name={'title'}
+          placeholder="Deck title"
+          style={styles.input}
+          component={MyTextInput}
+        />
+        <SubmitBtn onPress={handleSubmit(this.submit.bind(this))} />
       </View>
     );
   }
@@ -114,10 +86,23 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: white
   },
-  row: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'center'
+  title: {
+    fontSize: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    textAlign: 'center',
+    marginBottom: 30
+  },
+  input: {
+    borderColor: 'black',
+    borderWidth: 1,
+    height: 40,
+    width: 300,
+    borderRadius: 7,
+    alignItems: 'center',
+    marginBottom: 30,
+    padding: 10
   },
   iosSubmitBtn: {
     backgroundColor: purple,
@@ -134,7 +119,6 @@ const styles = StyleSheet.create({
     paddingRight: 30,
     height: 45,
     borderRadius: 2,
-    alignSelf: 'flex-end',
     justifyContent: 'center',
     alignItems: 'center'
   },
@@ -152,12 +136,15 @@ const styles = StyleSheet.create({
   }
 });
 
-const mapStateToProps = state => {
-  //const key = timeToString();
-  return {
-    //alreadyLogged: state[key] && typeof state[key].today === 'undefined'
-    temp: 'temp'
-  };
+const validate = values => {
+  const errors = {};
+  if (!values.title) {
+    errors.title = 'Title is required';
+  }
+  return errors;
 };
 
-export default connect(mapStateToProps)(AddDeck);
+export default reduxForm({
+  form: 'addDeck',
+  validate
+})(connect(null, actions)(AddDeck));
