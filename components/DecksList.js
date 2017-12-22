@@ -29,13 +29,26 @@ class DecksList extends Component {
       );
   }
 
+  _keyExtractor = (item, index) => item.title;
+
   renderDecks = decks => {
+    const data = Object.keys(decks).map(title => decks[title]);
+    console.log(data);
     return (
-      <View style={styles.item}>
-        {Object.keys(decks).map(title =>
-          this.renderItem(title, decks[title].cards)
+      // <View style={styles.item}>
+      //   {Object.keys(decks).map(title =>
+      //     this.renderItem(title, decks[title].cards)
+      //   )}
+      // </View>
+      <FlatList
+        data={data}
+        renderItem={({ item }) => (
+          <Text>
+            {item.title} {item.cards.length} cards
+          </Text>
         )}
-      </View>
+        keyExtractor={this._keyExtractor}
+      />
     );
   };
 
@@ -64,9 +77,11 @@ class DecksList extends Component {
 
     return (
       <View style={styles.container}>
-        {Object.keys(decks).length
-          ? this.renderDecks(decks)
-          : this.renderEmptyDecks()}
+        <View>
+          {Object.keys(decks).length
+            ? this.renderDecks(decks)
+            : this.renderEmptyDecks()}
+        </View>
       </View>
     );
   }
