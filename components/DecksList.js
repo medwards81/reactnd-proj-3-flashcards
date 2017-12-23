@@ -7,10 +7,11 @@ import {
   TouchableOpacity,
   FlatList
 } from 'react-native';
+import { List, ListItem, SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { receiveDecks, addDeck } from '../actions';
+import { receiveDecks, addDeck, removeDeck } from '../actions';
 import { getDecks } from '../utils/api';
-import { white } from '../utils/colors/';
+import { purple, white } from '../utils/colors/';
 import { AppLoading } from 'expo';
 
 class DecksList extends Component {
@@ -29,26 +30,30 @@ class DecksList extends Component {
       );
   }
 
-  _keyExtractor = (item, index) => item.title;
+  toDeckDetail = id => {
+    this.props.navigation.navigate('DeckDetail', {
+      deckId: id
+    });
+  };
 
   renderDecks = decks => {
     const data = Object.keys(decks).map(title => decks[title]);
-    console.log(data);
     return (
-      // <View style={styles.item}>
-      //   {Object.keys(decks).map(title =>
-      //     this.renderItem(title, decks[title].cards)
-      //   )}
-      // </View>
-      <FlatList
-        data={data}
-        renderItem={({ item }) => (
-          <Text>
-            {item.title} {item.cards.length} cards
-          </Text>
-        )}
-        keyExtractor={this._keyExtractor}
-      />
+      <List containerStyle={styles.list}>
+        <FlatList
+          data={data}
+          renderItem={({ item }) => (
+            <ListItem
+              title={item.title}
+              titleStyle={styles.listItem}
+              subtitle={`${item.cards.length} cards`}
+              containerStyle={{ borderBottomWidth: 1 }}
+              onPress={() => this.toDeckDetail(item.title)}
+            />
+          )}
+          keyExtractor={(item, index) => item.title}
+        />
+      </List>
     );
   };
 
@@ -90,7 +95,7 @@ class DecksList extends Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: 0,
     backgroundColor: white
   },
   item: {
@@ -115,6 +120,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
     textAlign: 'center'
+  },
+  list: {
+    borderTopWidth: 0,
+    borderBottomWidth: 0
+  },
+  listItem: {
+    fontSize: 18
   }
 });
 

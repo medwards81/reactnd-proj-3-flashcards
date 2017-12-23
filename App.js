@@ -4,8 +4,9 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducer from './reducers';
 import DecksList from './components/DecksList';
+import DeckDetail from './components/DeckDetail';
 import AddDeck from './components/AddDeck';
-import { TabNavigator } from 'react-navigation';
+import { TabNavigator, StackNavigator } from 'react-navigation';
 import { purple, white } from './utils/colors';
 import { Constants } from 'expo';
 
@@ -17,7 +18,7 @@ const AppStatusBar = ({ backgroundColor, ...props }) => {
   );
 };
 
-const MainScreenNavigator = TabNavigator(
+const Tabs = TabNavigator(
   {
     Decks: {
       screen: DecksList,
@@ -53,13 +54,29 @@ const MainScreenNavigator = TabNavigator(
   }
 );
 
+const MainNavigator = StackNavigator({
+  Home: {
+    screen: Tabs
+  },
+  DeckDetail: {
+    screen: DeckDetail,
+    navigationOptions: {
+      headerTintColor: white,
+      title: 'DECKS',
+      headerStyle: {
+        backgroundColor: purple
+      }
+    }
+  }
+});
+
 export default class App extends React.Component {
   render() {
     return (
       <Provider store={createStore(reducer)}>
         <View style={{ flex: 1 }}>
           <AppStatusBar backgroundColor={purple} barStyle="light-content" />
-          <MainScreenNavigator />
+          <MainNavigator />
         </View>
       </Provider>
     );

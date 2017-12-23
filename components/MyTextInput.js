@@ -16,9 +16,6 @@ export default function MyTextInput(props) {
         onFocus={input.onFocus}
         value={input.value}
       />
-      {touched &&
-        ((error && <Text>{error}</Text>) ||
-          (warning && <Text>{warning}</Text>))}
     </View>
   );
 }

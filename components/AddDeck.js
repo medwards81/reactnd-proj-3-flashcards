@@ -5,9 +5,10 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  Platform
+  Platform,
+  ScrollView
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { addDeck } from '../actions';
 import { saveDeckTitle } from '../utils/api';
 import MyTextInput from './MyTextInput';
@@ -31,32 +32,10 @@ function SubmitBtn({ onPress }) {
 }
 
 class AddDeck extends Component {
-  renderField({
-    input: { onChange, ...restInput },
-    meta: { touched, error, warning }
-  }) {
-    return (
-      <View>
-        <TextInput
-          style={styles.input}
-          onChangeText={onChange}
-          {...restInput}
-        />
-
-        {touched &&
-          ((error && <Text>{error}</Text>) ||
-            (warning && <Text>{warning}</Text>))}
-      </View>
-    );
-  }
   submit = ({ title }) => {
     if (!title.length) return false;
 
-    this.props.dispatch(
-      addDeck({
-        [title]: { title: title, cards: [] }
-      })
-    );
+    this.props.addDeck({ [title]: { title, cards: [] } });
 
     this.toHome();
 
@@ -72,6 +51,8 @@ class AddDeck extends Component {
   render() {
     const { handleSubmit } = this.props;
 
+    // wrapping text field in scrollview component allows tapping outside of keyboard to close the keyboard
+
     return (
       <View style={[styles.container, styles.center]}>
         <Text style={styles.title}>What is the title of your new deck?</Text>
@@ -82,6 +63,7 @@ class AddDeck extends Component {
           component={MyTextInput}
         />
         <SubmitBtn onPress={handleSubmit(this.submit.bind(this))} />
+        <KeyboardSpacer />
       </View>
     );
   }
@@ -137,9 +119,7 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 30,
-    marginRight: 30
+    alignItems: 'center'
   }
 });
 
