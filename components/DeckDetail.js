@@ -21,7 +21,7 @@ function SubmitBtn({ onPress, text }) {
       }
       onPress={onPress}
     >
-      <Text style={styles.submitBtnText}>Marc</Text>
+      <Text style={styles.submitBtnText}>{text}</Text>
     </TouchableOpacity>
   );
 }
@@ -69,7 +69,13 @@ class DeckDetail extends Component {
         <Text style={styles.title}>{title}</Text>
         <Text style={styles.cards}>{cards.length} cards</Text>
         <SubmitBtn key="addCard" onPress={this.addCard} text="ADD CARD" />
-        <SubmitBtn key="startQuiz" onPress={this.startQuiz} text="START QUIZ" />
+        {cards.length > -1 ? (
+          <SubmitBtn
+            key="startQuiz"
+            onPress={this.startQuiz}
+            text="START QUIZ"
+          />
+        ) : null}
         <TextButton style={{ margin: 20 }} onPress={this.deleteDeck}>
           DELETE DECK
         </TextButton>
@@ -89,7 +95,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   cards: {
-    fontSize: 14,
+    fontSize: 16,
     color: silver
   },
   center: {
@@ -103,7 +109,8 @@ const styles = StyleSheet.create({
     borderRadius: 7,
     height: 45,
     marginLeft: 40,
-    marginRight: 40
+    marginRight: 40,
+    marginTop: 20
   },
   AndroidSubmitBtn: {
     backgroundColor: purple,
@@ -113,12 +120,14 @@ const styles = StyleSheet.create({
     height: 45,
     borderRadius: 2,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 20
   },
   submitBtnText: {
     color: white,
     fontSize: 22,
-    textAlign: 'center'
+    textAlign: 'center',
+    width: 125
   }
 });
 
