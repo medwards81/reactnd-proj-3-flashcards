@@ -14,11 +14,11 @@ export function getDeck(id) {
     .then(data => (data[id] === null ? {} : data[id]));
 }
 
-export function saveDeckTitle(title) {
+export function saveDeckTitle(title, inserted) {
   return AsyncStorage.mergeItem(
     DECKS_STORAGE_KEY,
     JSON.stringify({
-      [title]: { title: title, cards: [] }
+      [title]: { title: title, cards: [], inserted }
     })
   );
 }
