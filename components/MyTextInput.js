@@ -6,7 +6,6 @@ import { purple, white, errorColor, errorTextColor } from '../utils/colors';
  */
 export default function MyTextInput(props) {
   const { input, meta: { touched, error, warning }, ...inputProps } = props;
-
   const errorStyle = touched && error ? styles.inputError : {};
 
   return (
