@@ -7,6 +7,8 @@ import { getDecks } from '../utils/api';
 import { purple, white } from '../utils/colors/';
 import { AppLoading } from 'expo';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import sortBy from 'sort-by';
+import { clearLocalNotification } from '../utils/helpers';
 
 class DecksList extends Component {
   state = {
@@ -18,11 +20,12 @@ class DecksList extends Component {
 
     getDecks()
       .then(decks => dispatch(receiveDecks(decks)))
-      .then(() =>
+      .then(decks => {
+        if (Object.keys(decks).length < 1) clearLocalNotification();
         this.setState(() => ({
           ready: true
-        }))
-      );
+        }));
+      });
   }
 
   toDeckDetail = id => {
@@ -33,6 +36,7 @@ class DecksList extends Component {
 
   renderDecks = decks => {
     const data = Object.keys(decks).map(title => decks[title]);
+    data.sort(sortBy('-inserted'));
     return (
       <List containerStyle={styles.list}>
         <FlatList
@@ -65,7 +69,7 @@ class DecksList extends Component {
         style={styles.center}
       />
       <Text style={[styles.noDataText, styles.center]}>
-        You haven't created any decks yet. Click New Deck to add one.
+        No decks found. Click New Deck to add one.
       </Text>
     </View>
   );
@@ -117,7 +121,7 @@ const styles = StyleSheet.create({
     }
   },
   noDataText: {
-    fontSize: 20,
+    fontSize: 16,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
