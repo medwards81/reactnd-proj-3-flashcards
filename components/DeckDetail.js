@@ -11,9 +11,9 @@ import { connect } from 'react-redux';
 import { purple, white, silver } from '../utils/colors';
 import TextButton from './TextButton';
 import { removeDeck as removeDeckAction } from '../actions';
-import { getDeck, removeDeck } from '../utils/api';
+import { getDeck, removeDeck as removeDeckFromStorage } from '../utils/api';
 
-function SubmitBtn({ onPress, text }) {
+const SubmitBtn = ({ onPress, text }) => {
   return (
     <TouchableOpacity
       style={
@@ -24,11 +24,27 @@ function SubmitBtn({ onPress, text }) {
       <Text style={styles.submitBtnText}>{text}</Text>
     </TouchableOpacity>
   );
-}
+};
+
+const SubmitBtnGhost = ({ onPress, text = {} }) => {
+  return (
+    <TouchableOpacity
+      style={
+        Platform.OS === 'ios'
+          ? styles.iosSubmitBtnGhost
+          : styles.AndroidSubmitBtnGhost
+      }
+      onPress={onPress}
+    >
+      <Text style={styles.submitBtnTextGhost}>{text}</Text>
+    </TouchableOpacity>
+  );
+};
 
 class DeckDetail extends Component {
   state = {
-    ready: false
+    ready: false,
+    deck: { cards: [] }
   };
 
   componentDidMount() {
@@ -43,19 +59,30 @@ class DeckDetail extends Component {
   }
 
   deleteDeck = () => {
-    const { remove, goBack, deckId } = this.props;
+    const { removeDeckFromState, goBack, deckId } = this.props;
 
-    remove(deckId);
+    removeDeckFromState(deckId);
     goBack();
-    removeDeck(deckId);
+    removeDeckFromStorage(deckId);
   };
 
   startQuiz = () => {
     console.log('start quiz!');
   };
 
-  addCard = () => {
-    console.log('add card!');
+  addCard = deckId => {
+    this.props.navigation.navigate('AddCard', {
+      deckId,
+      onNavBack: this.handleOnNavBack
+    });
+  };
+
+  handleOnNavBack = card => {
+    console.log('handleOnNavBack()', card);
+    let newDeck = { ...this.state.deck };
+    newDeck.cards.push(card);
+    console.log({ newDeck });
+    this.setState({ deck: newDeck });
   };
 
   render() {
@@ -67,9 +94,15 @@ class DeckDetail extends Component {
     return (
       <View style={[styles.container, styles.center]}>
         <Text style={styles.title}>{title}</Text>
-        <Text style={styles.cards}>{cards.length} cards</Text>
-        <SubmitBtn key="addCard" onPress={this.addCard} text="ADD CARD" />
-        {cards.length > -1 ? (
+        <Text style={styles.cards}>
+          {cards.length + ' ' + (cards.length == 1 ? 'card' : 'cards')}
+        </Text>
+        <SubmitBtnGhost
+          key="addCard"
+          onPress={() => this.addCard(title)}
+          text="ADD CARD"
+        />
+        {cards.length ? (
           <SubmitBtn
             key="startQuiz"
             onPress={this.startQuiz}
@@ -95,8 +128,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   cards: {
-    fontSize: 16,
-    color: silver
+    fontSize: 18,
+    color: silver,
+    marginBottom: 15
   },
   center: {
     flex: 1,
@@ -128,6 +162,36 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     width: 125
+  },
+  iosSubmitBtnGhost: {
+    borderColor: purple,
+    borderWidth: 1,
+    backgroundColor: white,
+    padding: 10,
+    borderRadius: 7,
+    height: 45,
+    marginLeft: 40,
+    marginRight: 40,
+    marginTop: 20
+  },
+  AndroidSubmitBtnGhost: {
+    borderColor: purple,
+    borderWidth: 1,
+    backgroundColor: white,
+    padding: 10,
+    paddingLeft: 30,
+    paddingRight: 30,
+    height: 45,
+    borderRadius: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20
+  },
+  submitBtnTextGhost: {
+    color: purple,
+    fontSize: 22,
+    textAlign: 'center',
+    width: 125
   }
 });
 
@@ -135,6 +199,7 @@ function mapStateToProps(state, { navigation }) {
   const { deckId } = navigation.state.params;
 
   return {
+    decks: state.decks,
     deckId
   };
 }
@@ -143,7 +208,7 @@ function mapDispatchToProps(dispatch, { navigation }) {
   const { deckId } = navigation.state.params;
 
   return {
-    remove: () => dispatch(removeDeckAction(deckId)),
+    removeDeckFromState: () => dispatch(removeDeckAction(deckId)),
     goBack: () => navigation.goBack()
   };
 }

@@ -2,11 +2,9 @@ import React, { Component } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  Platform,
-  ScrollView
+  Platform
 } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 import { addDeck } from '../actions';
@@ -33,8 +31,6 @@ function SubmitBtn({ onPress }) {
 
 class AddDeck extends Component {
   submit = ({ title }) => {
-    if (!title.length) return false;
-
     this.props.addDeck({ [title]: { title, cards: [] } });
 
     this.toHome();
@@ -45,13 +41,12 @@ class AddDeck extends Component {
   };
 
   toHome = () => {
-    this.props.navigation.dispatch(NavigationActions.back({ key: 'AddDeck' }));
+    //this.props.navigation.dispatch(NavigationActions.back({ key: 'AddDeck' }));
+    this.props.navigation.goBack();
   };
 
   render() {
     const { handleSubmit } = this.props;
-
-    // wrapping text field in scrollview component allows tapping outside of keyboard to close the keyboard
 
     return (
       <View style={[styles.container, styles.center]}>
@@ -59,7 +54,6 @@ class AddDeck extends Component {
         <Field
           name={'title'}
           placeholder="Deck title"
-          style={styles.input}
           component={MyTextInput}
         />
         <SubmitBtn onPress={handleSubmit(this.submit.bind(this))} />
@@ -76,22 +70,12 @@ const styles = StyleSheet.create({
     backgroundColor: white
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
     textAlign: 'center',
     marginBottom: 30
-  },
-  input: {
-    borderColor: 'black',
-    borderWidth: 1,
-    height: 40,
-    width: 300,
-    borderRadius: 7,
-    alignItems: 'center',
-    marginBottom: 30,
-    padding: 10
   },
   iosSubmitBtn: {
     backgroundColor: purple,
@@ -126,6 +110,8 @@ const styles = StyleSheet.create({
 const validate = values => {
   const errors = {};
   if (!values.title) {
+    errors.title = 'Title is required';
+  } else if (!values.title.trim()) {
     errors.title = 'Title is required';
   }
   return errors;

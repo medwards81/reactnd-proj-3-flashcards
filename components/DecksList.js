@@ -1,23 +1,18 @@
 import React, { Component } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Platform,
-  TouchableOpacity,
-  FlatList
-} from 'react-native';
-import { List, ListItem, SearchBar } from 'react-native-elements';
+import { View, Text, StyleSheet, Platform, FlatList } from 'react-native';
+import { List, ListItem } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { receiveDecks, addDeck, removeDeck } from '../actions';
+import { receiveDecks } from '../actions';
 import { getDecks } from '../utils/api';
 import { purple, white } from '../utils/colors/';
 import { AppLoading } from 'expo';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 class DecksList extends Component {
   state = {
     ready: false
   };
+
   componentDidMount() {
     const { dispatch } = this.props;
 
@@ -46,7 +41,11 @@ class DecksList extends Component {
             <ListItem
               title={item.title}
               titleStyle={styles.listItem}
-              subtitle={`${item.cards.length} cards`}
+              subtitle={
+                item.cards.length +
+                ' ' +
+                (item.cards.length == 1 ? 'card' : 'cards')
+              }
               containerStyle={{ borderBottomWidth: 1 }}
               onPress={() => this.toDeckDetail(item.title)}
             />
@@ -57,18 +56,15 @@ class DecksList extends Component {
     );
   };
 
-  renderItem = (title, cards) => {
-    return (
-      <View key={title}>
-        <Text style={{ fontSize: 35 }}>{title}</Text>
-        <Text>{cards.length} cards</Text>
-      </View>
-    );
-  };
-
   renderEmptyDecks = () => (
     <View style={styles.item}>
-      <Text style={styles.noDataText}>
+      <MaterialCommunityIcons
+        name="alert-circle-outline"
+        color={purple}
+        size={32}
+        style={styles.center}
+      />
+      <Text style={[styles.noDataText, styles.center]}>
         You haven't created any decks yet. Click New Deck to add one.
       </Text>
     </View>
@@ -98,6 +94,12 @@ const styles = StyleSheet.create({
     padding: 0,
     backgroundColor: white
   },
+  center: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    textAlign: 'center'
+  },
   item: {
     backgroundColor: white,
     borderRadius: Platform.OS === 'ios' ? 16 : 2,
@@ -126,7 +128,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0
   },
   listItem: {
-    fontSize: 18
+    fontSize: 20
   }
 });
 
