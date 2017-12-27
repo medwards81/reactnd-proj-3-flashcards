@@ -1,6 +1,7 @@
-import { RECEIVE_DECKS, ADD_DECK, REMOVE_DECK } from '../actions';
+import { RECEIVE_DECKS, ADD_DECK, REMOVE_DECK, ADD_CARD } from '../actions';
 
 const decks = (state = {}, action) => {
+  let newState;
   switch (action.type) {
     case RECEIVE_DECKS:
       return {
@@ -13,8 +14,12 @@ const decks = (state = {}, action) => {
         ...action.deck
       };
     case REMOVE_DECK:
-      const newState = { ...state };
+      newState = { ...state };
       delete newState[action.deck];
+      return newState;
+    case ADD_CARD:
+      newState = { ...state };
+      newState[action.data.title].cards.push(action.data.card);
       return newState;
     default:
       return state;

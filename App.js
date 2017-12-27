@@ -6,6 +6,7 @@ import reducer from './reducers';
 import DecksList from './components/DecksList';
 import DeckDetail from './components/DeckDetail';
 import AddDeck from './components/AddDeck';
+import AddCard from './components/AddCard';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 import { purple, white } from './utils/colors';
 import { Constants } from 'expo';
@@ -62,7 +63,17 @@ const MainNavigator = StackNavigator({
     screen: DeckDetail,
     navigationOptions: {
       headerTintColor: white,
-      title: 'DECKS',
+      title: 'Deck Details',
+      headerStyle: {
+        backgroundColor: purple
+      }
+    }
+  },
+  AddCard: {
+    screen: AddCard,
+    navigationOptions: {
+      headerTintColor: white,
+      title: 'Add Card',
       headerStyle: {
         backgroundColor: purple
       }

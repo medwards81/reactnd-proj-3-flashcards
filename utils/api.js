@@ -23,11 +23,21 @@ export function saveDeckTitle(title) {
   );
 }
 
-export function removeDeck(key) {
+export function addCardToDeck(title, card) {
   return AsyncStorage.getItem(DECKS_STORAGE_KEY).then(results => {
     const data = JSON.parse(results);
-    data[key] = undefined;
-    delete data[key];
+    let currentDeck = data[title];
+    if (!currentDeck) return false;
+    currentDeck.cards.push(card);
+    AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data));
+  });
+}
+
+export function removeDeck(title) {
+  return AsyncStorage.getItem(DECKS_STORAGE_KEY).then(results => {
+    const data = JSON.parse(results);
+    data[title] = undefined;
+    delete data[title];
     AsyncStorage.setItem(DECKS_STORAGE_KEY, JSON.stringify(data));
   });
 }
