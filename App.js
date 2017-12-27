@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Platform, StatusBar } from 'react-native';
+import { View, Platform, StatusBar, Button } from 'react-native';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducer from './reducers';
@@ -7,8 +7,9 @@ import DecksList from './components/DecksList';
 import DeckDetail from './components/DeckDetail';
 import AddDeck from './components/AddDeck';
 import AddCard from './components/AddCard';
+import Quiz from './components/Quiz';
 import { TabNavigator, StackNavigator } from 'react-navigation';
-import { purple, white } from './utils/colors';
+import { purple, white, silver } from './utils/colors';
 import { Constants } from 'expo';
 
 const AppStatusBar = ({ backgroundColor, ...props }) => {
@@ -61,13 +62,20 @@ const MainNavigator = StackNavigator({
   },
   DeckDetail: {
     screen: DeckDetail,
-    navigationOptions: {
+    navigationOptions: ({ navigation }) => ({
       headerTintColor: white,
-      title: 'Deck Details',
+      title: `${navigation.state.params.deckId}`,
       headerStyle: {
         backgroundColor: purple
-      }
-    }
+      },
+      headerRight: navigation.state.params.fromCreate ? (
+        <Button
+          title="Home"
+          color={silver}
+          onPress={() => navigation.navigate('Home')}
+        />
+      ) : null
+    })
   },
   AddCard: {
     screen: AddCard,
@@ -78,6 +86,16 @@ const MainNavigator = StackNavigator({
         backgroundColor: purple
       }
     }
+  },
+  Quiz: {
+    screen: Quiz,
+    navigationOptions: ({ navigation }) => ({
+      headerTintColor: white,
+      title: `Quiz: ${navigation.state.params.deckId}`,
+      headerStyle: {
+        backgroundColor: purple
+      }
+    })
   }
 });
 
