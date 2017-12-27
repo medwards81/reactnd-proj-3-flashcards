@@ -48,7 +48,7 @@ class DeckDetail extends Component {
   };
 
   componentDidMount() {
-    const { dispatch, deckId } = this.props;
+    const { deckId } = this.props;
 
     getDeck(deckId).then(deck =>
       this.setState(() => ({
@@ -67,7 +67,9 @@ class DeckDetail extends Component {
   };
 
   startQuiz = () => {
-    console.log('start quiz!');
+    this.props.navigation.navigate('Quiz', {
+      deckId: this.props.deckId
+    });
   };
 
   addCard = deckId => {
@@ -78,10 +80,8 @@ class DeckDetail extends Component {
   };
 
   handleOnNavBack = card => {
-    console.log('handleOnNavBack()', card);
     let newDeck = { ...this.state.deck };
     newDeck.cards.push(card);
-    console.log({ newDeck });
     this.setState({ deck: newDeck });
   };
 
@@ -109,7 +109,7 @@ class DeckDetail extends Component {
             text="START QUIZ"
           />
         ) : null}
-        <TextButton style={{ margin: 20 }} onPress={this.deleteDeck}>
+        <TextButton style={{ margin: 40 }} onPress={this.deleteDeck}>
           DELETE DECK
         </TextButton>
       </View>
