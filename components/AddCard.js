@@ -34,9 +34,6 @@ function SubmitBtn({ onPress }) {
 class AddCard extends Component {
   submit = ({ question, answer }) => {
     const title = this.props.navigation.state.params.deckId;
-
-    if (!question || !answer) return false;
-
     const card = { question, answer };
     this.props.addCard(title, card);
     addCardToDeck(title, card);
@@ -45,7 +42,6 @@ class AddCard extends Component {
 
   toDeckDetails = card => {
     this.props.navigation.state.params.onNavBack(card);
-    //this.props.navigation.dispatch(NavigationActions.back());
     this.props.navigation.goBack();
   };
 
@@ -54,18 +50,13 @@ class AddCard extends Component {
 
     return (
       <View style={[styles.container, styles.center]}>
+        <Text style={styles.title}>Add Card</Text>
         <Field
           name={'question'}
           placeholder="Question"
-          style={styles.input}
           component={MyTextInput}
         />
-        <Field
-          name={'answer'}
-          placeholder="answer"
-          style={styles.input}
-          component={MyTextInput}
-        />
+        <Field name={'answer'} placeholder="Answer" component={MyTextInput} />
         <SubmitBtn onPress={handleSubmit(this.submit.bind(this))} />
         <KeyboardSpacer />
       </View>
@@ -80,22 +71,12 @@ const styles = StyleSheet.create({
     backgroundColor: white
   },
   title: {
-    fontSize: 40,
+    fontSize: 32,
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
     textAlign: 'center',
     marginBottom: 30
-  },
-  input: {
-    borderColor: 'black',
-    borderWidth: 1,
-    height: 40,
-    width: 300,
-    borderRadius: 7,
-    alignItems: 'center',
-    marginBottom: 30,
-    padding: 10
   },
   iosSubmitBtn: {
     backgroundColor: purple,
@@ -129,11 +110,12 @@ const styles = StyleSheet.create({
 
 const validate = values => {
   const errors = {};
-  if (!values.question) {
-    errors.title = 'Question is required';
+  if (!values.question || !values.question.trim()) {
+    errors.question = 'Question is required';
   }
-  if (!values.answer) {
-    errors.title = 'Answer is required';
+
+  if (!values.answer || !values.answer.trim()) {
+    errors.answer = 'Answer is required';
   }
   return errors;
 };

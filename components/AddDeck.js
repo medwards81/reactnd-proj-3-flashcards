@@ -7,7 +7,6 @@ import {
   Platform
 } from 'react-native';
 import KeyboardSpacer from 'react-native-keyboard-spacer';
-import { addDeck } from '../actions';
 import { saveDeckTitle } from '../utils/api';
 import MyTextInput from './MyTextInput';
 import { reduxForm, Field } from 'redux-form';
@@ -15,6 +14,7 @@ import { connect } from 'react-redux';
 import * as actions from '../actions';
 import { purple, white } from '../utils/colors';
 import { NavigationActions } from 'react-navigation';
+import { setLocalNotification } from '../utils/helpers';
 
 function SubmitBtn({ onPress }) {
   return (
@@ -31,18 +31,23 @@ function SubmitBtn({ onPress }) {
 
 class AddDeck extends Component {
   submit = ({ title }) => {
-    this.props.addDeck({ [title]: { title, cards: [] } });
+    const inserted = new Date().getTime();
+    this.props.addDeck({
+      [title]: { title, cards: [], inserted }
+    });
 
-    this.toHome();
+    this.toDeckDetail(title);
 
-    saveDeckTitle(title).then(() => {
-      //clearLocalNotification().then(setLocalNotification);
+    saveDeckTitle(title, inserted).then(() => {
+      setLocalNotification();
     });
   };
 
-  toHome = () => {
-    //this.props.navigation.dispatch(NavigationActions.back({ key: 'AddDeck' }));
-    this.props.navigation.goBack();
+  toDeckDetail = id => {
+    this.props.navigation.navigate('DeckDetail', {
+      deckId: id,
+      fromCreate: true
+    });
   };
 
   render() {
@@ -109,11 +114,10 @@ const styles = StyleSheet.create({
 
 const validate = values => {
   const errors = {};
-  if (!values.title) {
-    errors.title = 'Title is required';
-  } else if (!values.title.trim()) {
+  if (!values.title || !values.title.trim()) {
     errors.title = 'Title is required';
   }
+
   return errors;
 };
 
