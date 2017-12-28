@@ -13,7 +13,7 @@ import TextButton from './TextButton';
 import { removeDeck as removeDeckAction } from '../actions';
 import { getDeck, removeDeck as removeDeckFromStorage } from '../utils/api';
 
-const SubmitBtn = ({ onPress, text, style = {} }) => {
+const SubmitBtn = ({ onPress, text, style = {}, textStyle = {} }) => {
   return (
     <TouchableOpacity
       style={[
@@ -22,7 +22,22 @@ const SubmitBtn = ({ onPress, text, style = {} }) => {
       ]}
       onPress={onPress}
     >
-      <Text style={styles.submitBtnText}>{text}</Text>
+      <Text style={[styles.submitBtnText, textStyle]}>{text}</Text>
+    </TouchableOpacity>
+  );
+};
+
+const SubmitBtnGhost = ({ onPress, text = {}, textStyle = {} }) => {
+  return (
+    <TouchableOpacity
+      style={
+        Platform.OS === 'ios'
+          ? styles.iosSubmitBtnGhost
+          : styles.AndroidSubmitBtnGhost
+      }
+      onPress={onPress}
+    >
+      <Text style={[styles.submitBtnTextGhost, textStyle]}>{text}</Text>
     </TouchableOpacity>
   );
 };
@@ -32,16 +47,17 @@ class Quiz extends Component {
     super(props);
 
     this.flipCard = this.flipCard.bind(this);
-  }
+    this.exitQuiz = this.exitQuiz.bind(this);
 
-  state = {
-    ready: false,
-    cards: [],
-    currentCard: 1,
-    complete: false,
-    cardFace: 'question',
-    score: 0
-  };
+    this.state = {
+      ready: false,
+      cards: [],
+      currentCard: 1,
+      complete: false,
+      cardFace: 'question',
+      score: 0
+    };
+  }
 
   componentDidMount() {
     const { deckId } = this.props;
@@ -55,25 +71,67 @@ class Quiz extends Component {
   }
 
   makeAnswer(result) {
-    console.log(result);
+    const { cards, score, currentCard } = this.state;
+
+    const isComplete = currentCard == cards.length;
+    const newScore = result == 'right' ? score + 1 : score;
+    const nextCard = isComplete ? currentCard : currentCard + 1;
+
+    this.setState({
+      score: newScore,
+      currentCard: nextCard,
+      complete: isComplete,
+      cardFace: 'question'
+    });
   }
 
   flipCard() {
-    console.log('flipCard()');
     let cardFace;
     if (this.state.cardFace === 'question') cardFace = 'answer';
     else cardFace = 'question';
     this.setState({ cardFace });
   }
 
+  resetQuiz() {
+    this.setState({
+      ready: true,
+      currentCard: 1,
+      complete: false,
+      cardFace: 'question',
+      score: 0
+    });
+  }
+
+  exitQuiz() {
+    this.props.navigation.goBack();
+  }
+
   render() {
     if (!this.state.ready)
       return <ActivityIndicator size="large" color={purple} />;
 
-    const { cards, currentCard, cardFace } = this.state;
+    const { cards, currentCard, cardFace, complete, score } = this.state;
     const { question, answer } = cards[currentCard - 1];
 
-    console.log({ state: this.state });
+    if (complete)
+      return (
+        <View style={[styles.container, styles.center]}>
+          <Text style={styles.complete}>Quiz Complete!</Text>
+          <Text
+            style={styles.score}
+          >{`Score: ${score} / ${cards.length}`}</Text>
+          <SubmitBtnGhost
+            onPress={() => this.exitQuiz()}
+            textStyle={{ fontSize: 18 }}
+            text="EXIT QUIZ"
+          />
+          <SubmitBtn
+            textStyle={{ fontSize: 18 }}
+            onPress={() => this.resetQuiz()}
+            text="RESTART QUIZ"
+          />
+        </View>
+      );
 
     return (
       <View style={[styles.container]}>
@@ -122,6 +180,14 @@ const styles = StyleSheet.create({
   },
   question: {
     fontSize: 30
+  },
+  complete: {
+    fontSize: 30,
+    color: purple
+  },
+  score: {
+    fontSize: 22,
+    marginBottom: 30
   },
   cards: {
     fontSize: 18,
