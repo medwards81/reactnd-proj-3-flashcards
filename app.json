@@ -3,6 +3,18 @@
     "sdkVersion": "23.0.0",
     "orientation": "portrait",
     "name": "FlashCards",
-    "description": "Create your own flashcards and test yourself"
+    "description": "Create your own flashcards and test yourself",
+    "slug": "flashcards",
+    "version": "1.0",
+    "icon": "./icons/FlashCardIcon_512.png",
+    "notification": {
+      "icon": "./icons/FlashCardIcon_45.png"
+    },
+    "ios": {
+      "bundleIdentifier": "org.flashcards.exp"
+    },
+    "android": {
+      "package": "org.flashcards.exp"
+    }
   }
 }
