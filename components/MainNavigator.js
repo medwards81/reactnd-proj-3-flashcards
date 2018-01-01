@@ -5,6 +5,7 @@ import DeckDetail from './DeckDetail';
 import AddDeck from './AddDeck';
 import AddCard from './AddCard';
 import Quiz from './Quiz';
+import Settings from './Settings';
 import { purple, white, silver } from '../utils/colors';
 import { TabNavigator, StackNavigator } from 'react-navigation';
 
@@ -20,6 +21,12 @@ const Tabs = TabNavigator(
       screen: AddDeck,
       navigationOptions: {
         tabBarLabel: 'New Deck'
+      }
+    },
+    Settings: {
+      screen: Settings,
+      navigationOptions: {
+        tabBarLabel: 'Settings'
       }
     }
   },
@@ -59,7 +66,7 @@ const MainNavigator = StackNavigator({
       headerRight: navigation.state.params.fromCreate ? (
         <Button
           title="Home"
-          color={silver}
+          color={purple}
           onPress={() => navigation.navigate('Home')}
         />
       ) : null
