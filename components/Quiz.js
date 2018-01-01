@@ -12,6 +12,7 @@ import { purple, white, silver } from '../utils/colors';
 import TextButton from './TextButton';
 import { removeDeck as removeDeckAction } from '../actions';
 import { getDeck, removeDeck as removeDeckFromStorage } from '../utils/api';
+import FlipCard from 'react-native-flip-card';
 
 const SubmitBtn = ({ onPress, text, style = {}, textStyle = {} }) => {
   return (
@@ -55,7 +56,8 @@ class Quiz extends Component {
       currentCard: 1,
       complete: false,
       cardFace: 'question',
-      score: 0
+      score: 0,
+      flip: false
     };
   }
 
@@ -71,7 +73,7 @@ class Quiz extends Component {
   }
 
   makeAnswer(result) {
-    const { cards, score, currentCard } = this.state;
+    const { cards, score, currentCard, flip, cardFace } = this.state;
 
     const isComplete = currentCard == cards.length;
     const newScore = result == 'right' ? score + 1 : score;
@@ -81,7 +83,8 @@ class Quiz extends Component {
       score: newScore,
       currentCard: nextCard,
       complete: isComplete,
-      cardFace: 'question'
+      cardFace: 'question',
+      flip: false
     });
   }
 
@@ -89,7 +92,7 @@ class Quiz extends Component {
     let cardFace;
     if (this.state.cardFace === 'question') cardFace = 'answer';
     else cardFace = 'question';
-    this.setState({ cardFace });
+    this.setState({ cardFace, flip: !this.state.flip });
   }
 
   resetQuiz() {
@@ -98,7 +101,8 @@ class Quiz extends Component {
       currentCard: 1,
       complete: false,
       cardFace: 'question',
-      score: 0
+      score: 0,
+      flip: false
     });
   }
 
@@ -110,8 +114,10 @@ class Quiz extends Component {
     if (!this.state.ready)
       return <ActivityIndicator size="large" color={purple} />;
 
-    const { cards, currentCard, cardFace, complete, score } = this.state;
+    const { cards, currentCard, cardFace, complete, score, flip } = this.state;
     const { question, answer } = cards[currentCard - 1];
+
+    console.log({ flip, cardFace });
 
     if (complete)
       return (
@@ -132,40 +138,57 @@ class Quiz extends Component {
           />
         </View>
       );
-
-    return (
-      <View style={[styles.container]}>
-        <Text style={styles.counter}>{`${currentCard} / ${cards.length}`}</Text>
-        <View style={styles.center}>
-          {cardFace === 'question' ? (
-            <Text style={styles.question}>{question}</Text>
-          ) : (
-            <Text style={styles.question}>{answer}</Text>
-          )}
-          <TextButton
-            style={{
-              margin: 20,
-              color: purple,
-              fontSize: 20,
-              marginBottom: 40
-            }}
-            onPress={this.flipCard}
-          >
-            {cardFace === 'question' ? 'ANSWER' : 'QUESTION'}
-          </TextButton>
-          <SubmitBtn
-            style={{ backgroundColor: '#008000' }}
-            onPress={() => this.makeAnswer('right')}
-            text="CORRECT"
-          />
-          <SubmitBtn
-            style={{ backgroundColor: '#d4271b' }}
-            onPress={() => this.makeAnswer('wrong')}
-            text="INCORRECT"
-          />
+    else
+      return (
+        <View style={styles.cardsContainer}>
+          <Text
+            style={styles.counter}
+          >{`${currentCard} / ${cards.length}`}</Text>
+          <View style={styles.center}>
+            <FlipCard
+              flip={flip}
+              style={styles.card}
+              friction={6}
+              perspective={1000}
+              flipHorizontal={true}
+              flipVertical={false}
+              clickable={false}
+              alignHeight={true}
+              alignWidth={true}
+            >
+              {/* Face Side */}
+              <View style={[styles.faceBack, styles.face]}>
+                <Text style={styles.faceBackText}>{question}</Text>
+              </View>
+              {/* Back Side */}
+              <View style={[styles.faceBack, styles.back]}>
+                <Text style={styles.faceBackText}>{answer}</Text>
+              </View>
+            </FlipCard>
+            <TextButton
+              style={{
+                margin: 20,
+                color: purple,
+                fontSize: 20,
+                marginBottom: 40
+              }}
+              onPress={this.flipCard}
+            >
+              {this.state.cardFace === 'question' ? 'ANSWER' : 'QUESTION'}
+            </TextButton>
+            <SubmitBtn
+              style={{ backgroundColor: '#008000' }}
+              onPress={() => this.makeAnswer('right')}
+              text="CORRECT"
+            />
+            <SubmitBtn
+              style={{ backgroundColor: '#d4271b' }}
+              onPress={() => this.makeAnswer('wrong')}
+              text="INCORRECT"
+            />
+          </View>
         </View>
-      </View>
-    );
+      );
   }
 }
 
@@ -175,8 +198,15 @@ const styles = StyleSheet.create({
     backgroundColor: white,
     padding: 15
   },
+  cardsContainer: {
+    flex: 1,
+    backgroundColor: white,
+    padding: 15,
+    justifyContent: 'space-between'
+  },
   counter: {
-    fontSize: 18
+    fontSize: 18,
+    marginBottom: 30
   },
   question: {
     fontSize: 30
@@ -197,6 +227,11 @@ const styles = StyleSheet.create({
   center: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center'
+  },
+  centerCard: {
+    flex: 1,
+    justifyContent: 'space-between',
     alignItems: 'center'
   },
   iosSubmitBtn: {
@@ -254,6 +289,24 @@ const styles = StyleSheet.create({
     fontSize: 22,
     textAlign: 'center',
     width: 125
+  },
+  card: {
+    width: 350,
+    borderColor: '#CCC'
+  },
+  faceBack: {
+    flex: 1,
+    justifyContent: 'center'
+  },
+  faceBackText: {
+    fontSize: 30,
+    textAlign: 'center'
+  },
+  face: {
+    backgroundColor: '#F2F2F2'
+  },
+  back: {
+    backgroundColor: '#F2F2F2'
   }
 });
 
