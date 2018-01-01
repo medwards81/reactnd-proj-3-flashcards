@@ -15,6 +15,7 @@ import * as actions from '../actions';
 import { purple, white } from '../utils/colors';
 import { NavigationActions } from 'react-navigation';
 import { setLocalNotification } from '../utils/helpers';
+import dismissKeyboard from 'react-native-dismiss-keyboard';
 
 function SubmitBtn({ onPress }) {
   return (
@@ -35,6 +36,8 @@ class AddDeck extends Component {
     this.props.addDeck({
       [title]: { title, cards: [], inserted }
     });
+
+    dismissKeyboard();
 
     this.toDeckDetail(title);
 
